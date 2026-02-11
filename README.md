@@ -75,7 +75,6 @@ Patrón **MVC (Model-View-Controller)** con:
 |-----|----------|
 | **👑 Administrador** | Control total del sistema |
 | **🛍️ Vendedor** | Ventas y atención al cliente |
-| **👤 Cliente** | Ver membresía e historial |
 
 ---
 
@@ -97,7 +96,7 @@ Patrón **MVC (Model-View-Controller)** con:
 
 ### 1. Clonar el Repositorio
 ```bash
-git clone https://github.com/tu-usuario/GymManager.Web.git
+git clone https://github.com/javierborja09/GymManager.git
 cd GymManager.Web
 ```
 
