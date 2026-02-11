@@ -160,13 +160,6 @@ O presiona **F5** en Visual Studio.
 - [ ] API REST
 
 ---
-
-## 📄 Licencia
-
-MIT License - Ver archivo `LICENSE`
-
----
-
 ## 📫 Contacto
 
 [![GitHub](https://img.shields.io/badge/GitHub-Javierborja09-181717?style=flat-square&logo=github)](https://github.com/Javierborja09)
