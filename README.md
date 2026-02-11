@@ -7,7 +7,9 @@
 ![MVC](https://img.shields.io/badge/Pattern-MVC-green?style=flat-square)
 
 </div>
+
 ---
+
 ## ✨ Características Principales
 
 - 👥 **Gestión de Clientes** - Registro y administración completa
