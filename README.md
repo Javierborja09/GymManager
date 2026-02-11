@@ -1,9 +1,9 @@
 ﻿💪 GymManager Sistema completo de gestión para gimnasios con control de membresías, ventas y administración de clientes.
-
+<div align="center">
 ![.NET](https://img.shields.io/badge/.NET-Core-512BD4?style=flat-square&logo=dotnet)
 ![SQL Server](https://img.shields.io/badge/SQL%20Server-CC2927?style=flat-square&logo=microsoft-sql-server)
 ![MVC](https://img.shields.io/badge/Pattern-MVC-green?style=flat-square)
-
+</div>
 ---
 
 ## ✨ Características Principales
