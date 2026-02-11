@@ -1,0 +1,62 @@
+﻿@{
+    Layout = null; // Esto elimina el Navbar y el Footer del sistema
+}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>404 - No Encontrado</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d6efd 100%);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .error-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .display-1 {
+            font-weight: 900;
+            font-size: 8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-7 text-center error-container animate__animated animate__zoomIn">
+                <h1 class="display-1">404</h1>
+                <h2 class="mb-4">RUTA NO ENCONTRADA</h2>
+                <p class="lead mb-5 opacity-75">
+                    Parece que te has perdido en el entrenamiento. La página que buscas no existe en el sistema de **GymManager**.
+                </p>
+                <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+                    <a asp-controller="Dashboard" asp-action="Index" class="btn btn-light btn-lg px-5 rounded-pill shadow">
+                        <i class="bi bi-house-door-fill me-2"></i> Ir al Dashboard
+                    </a>
+                    <button onclick="history.back()" class="btn btn-outline-light btn-lg px-5 rounded-pill">
+                        <i class="bi bi-arrow-left me-2"></i> Volver Atrás
+                    </button>
+                </div>
+                <div class="mt-5">
+                    <small class="opacity-50">GymManager Pro - Barranca, Perú 2026</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

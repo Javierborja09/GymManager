@@ -1,0 +1,31 @@
+﻿@{
+    ViewData["Title"] = "Acceso Denegado";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-5">
+                    <h1 class="display-1 text-danger"><i class="bi bi-shield-lock"></i></h1>
+                    <h2 class="fw-bold">Acceso Denegado</h2>
+                    <p class="text-muted">
+                        Lo sentimos, no tienes los permisos necesarios para acceder a esta sección del sistema.
+                    </p>
+                    <hr>
+                    <div class="d-grid gap-2">
+                        <a asp-controller="Home" asp-action="Index" class="btn btn-primary py-2">
+                            Volver al Panel Principal
+                        </a>
+                        <form asp-action="Logout" method="post">
+                            <button type="submit" class="btn btn-outline-secondary w-100">
+                                Cerrar sesión e iniciar con otra cuenta
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <p class="mt-4 text-muted"><small>Barranca, Perú - GymManager Security System</small></p>
+        </div>
+    </div>
+</div>

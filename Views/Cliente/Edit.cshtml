@@ -1,0 +1,71 @@
+﻿@model GymManager.Models.Cliente
+
+@{
+    ViewData["Title"] = "Editar Cliente";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-lg border-0">
+            <div class="card-header bg-warning text-dark p-3">
+                <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Editar Información del Socio</h5>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Edit">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" asp-for="cliente_id" />
+                    <input type="hidden" asp-for="fecha_registro" />
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">DNI</label>
+                            <input asp-for="dni" class="form-control" readonly />
+                            <small class="text-muted">El DNI no se puede modificar.</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Estado</label>
+                            <select asp-for="estado" class="form-select">
+                                <option value="Activo">Activo</option>
+                                <option value="Deudor">Deudor</option>
+                                <option value="Inactivo">Inactivo</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Nombre</label>
+                            <input asp-for="nombre" class="form-control" required />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Apellido</label>
+                            <input asp-for="apellido" class="form-control" required />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Teléfono</label>
+                            <input asp-for="telefono" class="form-control" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Email</label>
+                            <input asp-for="email" type="email" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-secondary px-4">Volver</a>
+                        <button type="submit" class="btn btn-warning px-5 shadow fw-bold">Actualizar Datos</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
