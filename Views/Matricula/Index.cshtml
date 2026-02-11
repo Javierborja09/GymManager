@@ -1,4 +1,4 @@
-﻿@model IEnumerable<GymManager.Models.Matricula>
+﻿@model IEnumerable<GymManager.Models.DTOs.MatriculaDTO>
 
 @{
     ViewData["Title"] = "Control de Membresías";
@@ -24,36 +24,35 @@
                     <th>Vencimiento</th>
                     <th>Monto</th>
                     <th class="text-center">Estado</th>
-                    <th class="text-center">Acciones</th> @* Nueva Columna *@
+                    <th class="text-center">Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var item in Model)
                 {
-                    var diasRestantes = (item.fecha_fin - DateTime.Now).Days;
                     <tr>
                         <td class="ps-3">
-                            <div class="fw-bold">@item.Cliente?.nombre @item.Cliente?.apellido</div>
-                            <small class="text-muted">DNI: @item.Cliente?.dni</small>
+                            <div class="fw-bold">@item.SocioNombre</div>
+                            <small class="text-muted">DNI: @item.SocioDni</small>
                         </td>
                         <td>
                             <span class="badge bg-light text-dark border">
-                                @item.Plan?.nombre_plan
+                                @item.PlanNombre
                             </span>
                         </td>
-                        <td>@item.fecha_inicio.ToString("dd/MM/yyyy")</td>
+                        <td>@item.FechaInicio.ToString("dd/MM/yyyy")</td>
                         <td>
-                            <div class="@(diasRestantes < 0 ? "text-danger fw-bold" : "")">
-                                @item.fecha_fin.ToString("dd/MM/yyyy")
+                            <div class="@(item.DiasRestantes < 0 ? "text-danger fw-bold" : "")">
+                                @item.FechaFin.ToString("dd/MM/yyyy")
                             </div>
                         </td>
-                        <td class="fw-bold text-success">S/ @item.monto_pagado.ToString("N2")</td>
+                        <td class="fw-bold text-success">S/ @item.MontoPagado.ToString("N2")</td>
                         <td class="text-center">
-                            @if (diasRestantes < 0)
+                            @if (item.DiasRestantes < 0)
                             {
                                 <span class="badge bg-danger">Vencido</span>
                             }
-                            else if (diasRestantes <= 5)
+                            else if (item.DiasRestantes <= 5)
                             {
                                 <span class="badge bg-warning text-dark">Por Vencer</span>
                             }
@@ -62,7 +61,6 @@
                                 <span class="badge bg-success">Vigente</span>
                             }
                         </td>
-                        @* Botón de Ver Detalle añadido *@
                         <td class="text-center">
                             <a asp-action="Details" asp-route-id="@item.matricula_id" class="btn btn-sm btn-outline-primary rounded-pill px-3">
                                 <i class="bi bi-eye-fill me-1"></i> Ver Detalle

@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using GymManager.Data;
+﻿using GymManager.Data;
 using GymManager.Models;
+using GymManager.Web.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace GymManager.Controllers
 {
-    [Authorize(Roles = "Admin")] // Solo el administrador puede cambiar precios
+    [Authorize(Roles = "Admin")]
     public class PlanController : Controller
     {
         private readonly DBConnection _context;
@@ -17,11 +18,19 @@ namespace GymManager.Controllers
         }
 
         // Listado de planes actuales
-        public async Task<IActionResult>
-    Index()
+        public async Task<IActionResult> Index()
         {
-            var planes = await _context.Planes.ToListAsync();
-            return View(planes);
+            var planesDto = await _context.Planes
+                .Select(p => new PlanDTO
+                {
+                    PlanId = p.plan_id,
+                    NombrePlan = p.nombre_plan,
+                    DuracionDias = p.duracion_dias,
+                    Precio = p.precio
+                })
+                .ToListAsync();
+
+            return View(planesDto);
         }
 
         // Formulario para crear un nuevo plan

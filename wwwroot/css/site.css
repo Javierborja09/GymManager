@@ -17,6 +17,71 @@ html {
   min-height: 100%;
 }
 
+:root {
+    --primary-dark: #1a1a1a;
+    --accent-blue: #0d6efd;
+    --gym-orange: #ff6b00;
+}
+
 body {
-  margin-bottom: 60px;
+    background-color: #f4f7f6;
+    font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+}
+
+.navbar {
+    background-color: var(--primary-dark) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    padding: 0.8rem 0;
+}
+
+.navbar-brand {
+    font-weight: 800;
+    font-size: 1.4rem;
+    letter-spacing: 1px;
+    color: #fff !important;
+}
+
+.nav-link {
+    color: rgba(255,255,255,0.8) !important;
+    font-weight: 500;
+    margin: 0 5px;
+    transition: all 0.3s ease;
+}
+
+    .nav-link:hover {
+        color: var(--accent-blue) !important;
+        transform: translateY(-1px);
+    }
+
+.user-badge {
+    background: rgba(255,255,255,0.08);
+    padding: 6px 16px;
+    border-radius: 50px;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.1);
+    font-size: 0.85rem;
+}
+
+.dropdown-menu {
+    border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    padding: 10px;
+}
+
+.dropdown-item {
+    padding: 8px 15px;
+    border-radius: 8px;
+    transition: 0.2s;
+}
+
+    .dropdown-item:hover {
+        background-color: #f0f7ff;
+        color: var(--accent-blue);
+    }
+
+footer {
+    background: #fff;
+    padding: 2rem 0;
+    margin-top: 5rem;
 }

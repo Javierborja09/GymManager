@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using GymManager.Data;
+﻿using GymManager.Data;
 using GymManager.Models;
+using GymManager.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace GymManager.Controllers
 {
@@ -19,12 +20,23 @@ namespace GymManager.Controllers
         // Listado de membresías actuales
         public async Task<IActionResult> Index()
         {
-            var matriculas = await _context.Matriculas
+            var matriculasDto = await _context.Matriculas
                 .Include(m => m.Cliente)
                 .Include(m => m.Plan)
                 .OrderByDescending(m => m.fecha_inicio)
+                .Select(m => new MatriculaDTO
+                {
+                    matricula_id = m.matricula_id,
+                    SocioNombre = m.Cliente!.nombre + " " + m.Cliente.apellido,
+                    SocioDni = m.Cliente.dni,
+                    PlanNombre = m.Plan!.nombre_plan,
+                    FechaInicio = m.fecha_inicio,
+                    FechaFin = m.fecha_fin,
+                    MontoPagado = m.monto_pagado
+                })
                 .ToListAsync();
-            return View(matriculas);
+
+            return View(matriculasDto);
         }
 
         // Formulario de Nueva Matrícula

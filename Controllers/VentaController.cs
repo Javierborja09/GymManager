@@ -1,9 +1,8 @@
-﻿using GymManager.Data;
-using GymManager.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
+using GymManager.Data;
+using GymManager.Models.DTOs; 
+using Microsoft.AspNetCore.Authorization;
 using System.Text.Json;
 
 namespace GymManager.Controllers
@@ -18,21 +17,28 @@ namespace GymManager.Controllers
             _context = context;
         }
 
-        // Listado de ventas con carga de relaciones (Vendedor, Cliente, Productos)
         public async Task<IActionResult> Index()
         {
             var ventas = await _context.Ventas
-                .Include(v => v.Usuario)
-                .Include(v => v.Cliente)
-                .Include(v => v.DetalleVentas)
-                    .ThenInclude(d => d.Producto)
                 .OrderByDescending(v => v.venta_id)
+                .Select(v => new VentaDTO
+                {
+                    VentaId = v.venta_id,
+                    Fecha = v.fecha_venta,
+                    ClienteNombre = v.Cliente != null ? v.Cliente.nombre + " " + v.Cliente.apellido : "Público General",
+                    UsuarioNombre = v.Usuario != null ? v.Usuario.nombre : "Sistema",
+                    Total = v.total_venta,
+                    Productos = v.DetalleVentas.Select(d => new VentaDetalleDTO
+                    {
+                        ProductoNombre = d.Producto!.nombre,
+                        Cantidad = d.cantidad
+                    }).ToList()
+                })
                 .ToListAsync();
 
             return View(ventas);
         }
 
-        // Carga de datos para el formulario de venta
         public async Task<IActionResult> Create()
         {
             ViewBag.Productos = await _context.Productos.Where(p => p.stock_actual > 0).ToListAsync();
@@ -83,10 +89,5 @@ namespace GymManager.Controllers
                 return RedirectToAction(nameof(Create));
             }
         }
-    }
-        public class VentaItemDTO
-    {
-        public long producto_id { get; set; }
-        public int cantidad { get; set; }
     }
 }

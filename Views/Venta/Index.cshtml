@@ -1,11 +1,13 @@
-﻿@model IEnumerable<GymManager.Models.Venta>
+﻿@model IEnumerable<GymManager.Models.DTOs.VentaDTO>
 
 @{
     ViewData["Title"] = "Historial de Ventas";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4 animate__animated animate__fadeIn">
-    <h1 class="h3 mb-0 text-gray-800"><i class="bi bi-receipt-cutoff text-primary"></i> Historial de Ventas</h1>
+    <h1 class="h3 mb-0 text-gray-800">
+        <i class="bi bi-receipt-cutoff text-primary"></i> Historial de Ventas
+    </h1>
     <a asp-action="Create" class="btn btn-success rounded-pill px-4 shadow-sm">
         <i class="bi bi-cart-plus-fill me-1"></i> Nueva Venta
     </a>
@@ -18,7 +20,7 @@
                 <tr>
                     <th class="ps-3">ID</th>
                     <th>Fecha</th>
-                    <th>Productos Vendidos</th> @* Nueva columna para nombres *@
+                    <th>Productos Vendidos</th>
                     <th>Cliente</th>
                     <th>Atendido por</th>
                     <th class="text-end pe-3">Total</th>
@@ -28,38 +30,38 @@
                 @foreach (var item in Model)
                 {
                     <tr>
-                        <td class="ps-3 fw-bold text-primary">#@item.venta_id</td>
-                        <td>@item.fecha_venta.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td class="ps-3 fw-bold text-primary">#@item.VentaId</td>
+                        <td>@item.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
 
-                        @* Lógica para mostrar los productos del detalle *@
+                        @* Uso de la lista simplificada del DTO *@
                         <td>
-                            @if (item.DetalleVentas != null && item.DetalleVentas.Any())
+                            @if (item.Productos.Any())
                             {
-                                @foreach (var detalle in item.DetalleVentas)
+                                @foreach (var prod in item.Productos)
                                 {
-                                    <span class="badge bg-info text-dark border-info">
+                                    <span class="badge bg-info text-dark border-info me-1 mb-1">
                                         <i class="bi bi-box-seam me-1"></i>
-                                        @detalle.Producto?.nombre (@detalle.cantidad)
+                                        @prod.ProductoNombre (@prod.Cantidad)
                                     </span>
                                 }
                             }
                             else
                             {
-                                <span class="text-muted small italic">Sin productos</span>
+                                <span class="text-muted small italic">Sin productos registrados</span>
                             }
                         </td>
 
                         <td>
                             <i class="bi bi-person-circle me-1 text-secondary"></i>
-                            @(item.Cliente?.nombre ?? "Público General")
+                            @item.ClienteNombre
                         </td>
                         <td>
                             <span class="badge bg-light text-dark border">
-                                <i class="bi bi-person-badge me-1"></i> @item.Usuario?.nombre
+                                <i class="bi bi-person-badge me-1"></i> @item.UsuarioNombre
                             </span>
                         </td>
                         <td class="text-end pe-3 fw-bold text-success">
-                            S/ @item.total_venta.ToString("N2")
+                            S/ @item.Total.ToString("N2")
                         </td>
                     </tr>
                 }

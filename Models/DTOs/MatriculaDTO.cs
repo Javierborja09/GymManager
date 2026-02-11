@@ -2,9 +2,13 @@
 {
     public class MatriculaDTO
     {
-        public string ClienteNombre { get; set; } = string.Empty;
+        public long matricula_id { get; set; }
+        public string SocioNombre { get; set; } = string.Empty;
+        public string SocioDni { get; set; } = string.Empty;
         public string PlanNombre { get; set; } = string.Empty;
-        public DateTime fecha_fin { get; set; }
-        public bool EstaVencida => DateTime.Now > fecha_fin;
+        public DateTime FechaInicio { get; set; }
+        public DateTime FechaFin { get; set; }
+        public decimal MontoPagado { get; set; }
+        public int DiasRestantes => (FechaFin - DateTime.Now).Days;
     }
 }

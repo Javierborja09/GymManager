@@ -39,9 +39,11 @@
 
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary btn-lg shadow">
-                            Activar Membresía
+                            <i class="bi bi-check-circle me-1"></i> Activar Membresía
                         </button>
-                        <a asp-action="Index" class="btn btn-link text-muted">Volver al listado</a>
+                        <button type="button" onclick="window.history.back();" class="btn btn-link text-muted text-decoration-none">
+                            <i class="bi bi-arrow-left"></i> Volver
+                        </button>
                     </div>
                 </form>
             </div>

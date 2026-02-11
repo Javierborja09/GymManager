@@ -1,4 +1,6 @@
-﻿@{
+﻿@model GymManager.Web.Models.DTOs.DashboardDTO
+
+@{
     ViewData["Title"] = "Panel de Control";
 }
 
@@ -14,13 +16,13 @@
         <div class="card border-0 shadow-sm h-100 border-start border-success border-5 bg-success bg-opacity-10">
             <div class="card-body">
                 <h6 class="text-muted text-uppercase small fw-bold">Recaudación Total Hoy</h6>
-                <h3 class="fw-bold text-success mb-0">S/ @ViewBag.TotalRecaudadoHoy.ToString("N2")</h3>
+                <h3 class="fw-bold text-success mb-0">S/ @Model.TotalRecaudadoHoy.ToString("N2")</h3>
                 <div class="mt-2 small">
                     <div class="d-flex justify-content-between text-muted">
-                        <span>Membresías:</span> <span>S/ @ViewBag.MembresiasHoy.ToString("N2")</span>
+                        <span>Membresías:</span> <span>S/ @Model.MembresiasHoy.ToString("N2")</span>
                     </div>
                     <div class="d-flex justify-content-between text-muted">
-                        <span>Productos:</span> <span>S/ @ViewBag.ProductosHoy.ToString("N2")</span>
+                        <span>Productos:</span> <span>S/ @Model.ProductosHoy.ToString("N2")</span>
                     </div>
                 </div>
             </div>
@@ -33,7 +35,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <h6 class="text-muted text-uppercase small fw-bold">Socios Activos</h6>
-                        <h3 class="fw-bold mb-0">@ViewBag.SociosActivos</h3>
+                        <h3 class="fw-bold mb-0">@Model.SociosActivos</h3>
                     </div>
                     <div class="bg-primary bg-opacity-10 p-3 rounded-circle">
                         <i class="bi bi-people-fill text-primary fs-3"></i>
@@ -52,7 +54,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <h6 class="text-muted text-uppercase small fw-bold">Bajo Stock</h6>
-                        <h3 class="fw-bold mb-0">@ViewBag.BajoStock</h3>
+                        <h3 class="fw-bold mb-0">@Model.BajoStock</h3>
                     </div>
                     <div class="bg-warning bg-opacity-10 p-3 rounded-circle">
                         <i class="bi bi-box-seam text-warning fs-3"></i>
@@ -71,7 +73,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <h6 class="text-muted text-uppercase small fw-bold">Cierres Próximos</h6>
-                        <h3 class="fw-bold mb-0">@ViewBag.PorVencer</h3>
+                        <h3 class="fw-bold mb-0">@Model.PorVencer</h3>
                     </div>
                     <div class="bg-danger bg-opacity-10 p-3 rounded-circle">
                         <i class="bi bi-calendar-x text-danger fs-3"></i>
@@ -123,37 +125,37 @@
         <div class="card border-0 shadow-sm bg-primary text-white p-2 h-100">
             <div class="card-body text-center d-flex flex-column justify-content-center">
                 <i class="bi bi-trophy-fill fs-1 mb-3"></i>
-                <h4 class="fw-bold">Meta de @DateTime.Now.ToString("MMMM")</h4>
+                <h4 class="fw-bold">Meta de @Model.MesNombre</h4>
 
                 <div class="my-3">
-                    <span class="h2 fw-bold">S/ @ViewBag.MetaRecaudado.ToString("N2")</span>
+                    <span class="h2 fw-bold">S/ @Model.MetaRecaudado.ToString("N2")</span>
                     <br />
-                    <span class="opacity-75">Objetivo: S/ @ViewBag.MetaMonto.ToString("N2")</span>
+                    <span class="opacity-75">Objetivo: S/ @Model.MetaMonto.ToString("N2")</span>
                 </div>
 
                 <div class="progress bg-white bg-opacity-25" style="height: 15px; border-radius: 10px;">
                     <div class="progress-bar bg-white progress-bar-striped progress-bar-animated"
                          role="progressbar"
-                         style="width: @(ViewBag.MetaPorcentaje > 100 ? 100 : ViewBag.MetaPorcentaje)%">
+                         style="width: @(Model.MetaPorcentaje > 100 ? 100 : Model.MetaPorcentaje)%">
                     </div>
                 </div>
 
                 <p class="mt-3 mb-0 fw-bold">
-                    @if (ViewBag.MetaPorcentaje >= 100)
+                    @if (Model.MetaPorcentaje >= 100)
                     {
                         <span><i class="bi bi-check-circle-fill"></i> ¡Meta Mensual Lograda!</span>
                     }
                     else
                     {
-                        <span>Estás al @ViewBag.MetaPorcentaje% de tu objetivo</span>
+                        <span>Estás al @Model.MetaPorcentaje% de tu objetivo</span>
                     }
                 </p>
-                 @if (User.IsInRole("Admin"))
-                    {
-                <a asp-controller="MetaMensual" asp-action="Index" class="btn btn-sm btn-light mt-3 rounded-pill text-primary fw-bold">
-                    Ver Detalles del Año
-                </a>
-                    }
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-controller="MetaMensual" asp-action="Index" class="btn btn-sm btn-light mt-3 rounded-pill text-primary fw-bold">
+                        Ver Detalles del Año
+                    </a>
+                }
             </div>
         </div>
     </div>

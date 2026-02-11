@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using GymManager.Data;
+﻿using GymManager.Data;
 using GymManager.Models;
+using GymManager.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace GymManager.Controllers
 {
@@ -27,7 +28,19 @@ namespace GymManager.Controllers
                 query = query.Where(p => p.nombre.Contains(buscar) || p.categoria.Contains(buscar));
             }
 
-            return View(await query.ToListAsync());
+            // Proyección directa al DTO para mejorar el rendimiento
+            var productosDto = await query
+                .Select(p => new ProductoDTO
+                {
+                    ProductoId = p.producto_id,
+                    Nombre = p.nombre,
+                    PrecioVenta = p.precio_venta,
+                    StockActual = p.stock_actual,
+                    Categoria = p.categoria
+                })
+                .ToListAsync();
+
+            return View(productosDto);
         }
 
         // GET: Producto/Create

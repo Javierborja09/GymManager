@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using GymManager.Data;
+﻿using GymManager.Data;
 using GymManager.Models;
-using Microsoft.AspNetCore.Identity;
+using GymManager.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace GymManager.Controllers
 {
@@ -22,9 +23,18 @@ namespace GymManager.Controllers
         // GET: Lista de Usuarios
         public async Task<IActionResult> Index()
         {
-            // Listamos todos los usuarios registrados en el sistema
-            var usuarios = await _context.Usuarios.ToListAsync();
-            return View(usuarios);
+            var usuariosDto = await _context.Usuarios
+                .Select(u => new UsuarioDTO
+                {
+                    usuario_id = u.usuario_id,
+                    nombre = u.nombre,
+                    email = u.email,
+                    rol = u.rol,
+                    activo = u.activo
+                })
+                .ToListAsync();
+
+            return View(usuariosDto);
         }
 
         // GET: Formulario de Creación
