@@ -202,9 +202,8 @@ INSERT INTO Planes (nombre_plan, duracion_dias, precio) VALUES
 -- 2. USUARIOS (Personal del Gimnasio)
 -- Nota: En un sistema real, los passwords deben ir hasheados. 
 INSERT INTO Usuarios (nombre, email, password_hash, rol, activo) VALUES 
-('Administrador General', 'admin@gym.com', 'AQAAAAIAAYagAAAAEJ9xGvWfH8pZ6kYmX4nL2tR5vS8wQ0zX1yB2c3D4E5F6G7H8I9J0K1L2M3N4O5P', 'Admin', 1),
-('Vendedor Barranca', 'ventas@gym.com', 'AQAAAAIAAYagAAAAEJ9xGvWfH8pZ6kYmX4nL2tR5vS8wQ0zX1yB2c3D4E5F6G7H8I9J0K1L2M3N4O5P', 'Vendedor', 1)
-select * from Usuarios
+('Administrador General', 'admin@gym.com', 'AQAAAAIAAYagAAAAEF5RRA/nu+ppe+mmdh7HF7g3hO/vX1dmE7GRRoU0BU3Qf8oC2+3W5NX/960GHkxpig==', 'Admin', 1),
+('Vendedor Barranca', 'ventas@gym.com', 'AQAAAAIAAYagAAAAEF5RRA/nu+ppe+mmdh7HF7g3hO/vX1dmE7GRRoU0BU3Qf8oC2+3W5NX/960GHkxpig==', 'Vendedor', 1)
 -- 3. CLIENTES (Socios)
 INSERT INTO Clientes (dni, nombre, apellido, telefono, email, estado) VALUES 
 ('70654321', 'Carlos', 'Ruiz', '987654321', 'carlos.ruiz@gmail.com', 'Activo'),
