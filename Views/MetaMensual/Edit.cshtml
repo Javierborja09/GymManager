@@ -1,0 +1,49 @@
+﻿@model GymManager.Models.MetaMensual
+
+@{
+    ViewData["Title"] = "Editar Meta";
+    var nombreMes = System.Globalization.DateTimeFormatInfo.CurrentInfo.GetMonthName(Model.mes).ToUpper();
+}
+
+<div class="row justify-content-center animate__animated animate__fadeIn">
+    <div class="col-md-5">
+        <div class="card shadow border-0 mt-5">
+            <div class="card-header bg-primary text-white p-3 text-center">
+                <h5 class="mb-0 fw-bold">CONFIGURAR OBJETIVO: @nombreMes @Model.anio</h5>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Edit">
+                    @* Campos ocultos para no perder la referencia *@
+                    <input type="hidden" asp-for="meta_id" />
+                    <input type="hidden" asp-for="mes" />
+                    <input type="hidden" asp-for="anio" />
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Monto Objetivo Sugerido (S/)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light fw-bold">S/</span>
+                            <input asp-for="objetivo_monto" type="number" step="0.01"
+                                   class="form-control form-control-lg border-primary text-primary fw-bold" required />
+                        </div>
+                        <div class="form-text text-muted">Establece cuánto esperas recaudar este mes entre membresías y productos.</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Notas de la Campaña</label>
+                        <textarea asp-for="descripcion" class="form-control" rows="3"
+                                  placeholder="Ej: Aumento de meta por campaña de Fiestas Patrias..."></textarea>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg fw-bold shadow">
+                            <i class="bi bi-save2 me-2"></i> Guardar Meta Mensual
+                        </button>
+                        <a asp-action="Index" class="btn btn-link text-decoration-none text-muted">
+                            <i class="bi bi-arrow-left"></i> Regresar al panel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

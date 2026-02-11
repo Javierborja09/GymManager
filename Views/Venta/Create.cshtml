@@ -1,0 +1,171 @@
+﻿@model GymManager.Models.Venta
+
+<div class="row animate__animated animate__fadeIn">
+    <div class="col-md-4">
+        <div class="card shadow border-0 mb-4">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0">Agregar a la Venta</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Producto</label>
+                    <select id="pSelect" class="form-select">
+                        <option value="">-- Seleccionar --</option>
+                        @foreach (var p in ViewBag.Productos)
+                        {
+                            <option value="@p.producto_id"
+                                    data-nombre="@p.nombre"
+                                    data-precio="@p.precio_venta"
+                                    data-stock="@p.stock_actual">
+                                @p.nombre (Stock: @p.stock_actual) - S/ @p.precio_venta
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Cantidad</label>
+                    <input id="cInput" type="number" class="form-control" value="1" min="1" />
+                </div>
+                <button type="button" onclick="agregarProducto()" class="btn btn-primary w-100 shadow-sm">
+                    <i class="bi bi-plus-circle me-1"></i> Añadir a la lista
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <form asp-action="Create" method="post" id="ventaForm">
+            @Html.AntiForgeryToken()
+            <div id="hiddenInputsContainer"></div>
+
+            <div class="card shadow border-0">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-cart4 me-2"></i>Carrito de Compras</h5>
+                    <select name="cliente_id" class="form-select form-select-sm w-50">
+                        <option value="">Público General</option>
+                        @foreach (var c in ViewBag.Clientes)
+                        {
+                            <option value="@c.cliente_id">@c.dni - @c.nombre</option>
+                        }
+                    </select>
+                </div>
+                <div class="card-body">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Precio</th>
+                                <th>Cant.</th>
+                                <th>Subtotal</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="listaCuerpo"></tbody>
+                    </table>
+
+                    <div class="text-end mt-4">
+                        <h4 class="text-muted">Total Venta: <span class="text-success fw-bold">S/ <span id="tTotal">0.00</span></span></h4>
+                        <hr />
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" onclick="cancelarVenta()" class="btn btn-outline-danger px-4">
+                                <i class="bi bi-trash3 me-1"></i> Cancelar
+                            </button>
+                            <button type="submit" id="btnFinalizar" class="btn btn-success btn-lg px-5 shadow" disabled>
+                                <i class="bi bi-cash-stack me-1"></i> Finalizar y Cobrar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let productosVenta = [];
+
+        function agregarProducto() {
+            const select = document.getElementById('pSelect');
+            const cantInput = document.getElementById('cInput');
+            const option = select.options[select.selectedIndex];
+
+            if (!option.value || cantInput.value < 1) return;
+
+            const stockDisp = parseInt(option.getAttribute('data-stock'));
+            const cantPedida = parseInt(cantInput.value);
+            const pId = option.value;
+            const yaEnCarrito = productosVenta.find(x => x.id === pId);
+            const totalEnCarrito = yaEnCarrito ? yaEnCarrito.cantidad + cantPedida : cantPedida;
+
+            if (totalEnCarrito > stockDisp) {
+                alert(`Stock insuficiente. Solo quedan ${stockDisp} unidades.`);
+                return;
+            }
+
+            if (yaEnCarrito) {
+                yaEnCarrito.cantidad += cantPedida;
+            } else {
+                productosVenta.push({
+                    id: pId,
+                    nombre: option.getAttribute('data-nombre'),
+                    precio: parseFloat(option.getAttribute('data-precio')),
+                    cantidad: cantPedida
+                });
+            }
+
+            renderizarTabla();
+            select.value = '';
+            cantInput.value = 1;
+        }
+
+      function cancelarVenta() {
+    if (productosVenta.length > 0) {
+        if (confirm("¿Vaciar el carrito y salir?")) {
+                     productosVenta = [];
+                        renderizarTabla();
+            window.history.back();
+        }
+    } else {
+        window.history.back(); 
+    }
+}
+
+        function eliminar(index) {
+            productosVenta.splice(index, 1);
+            renderizarTabla();
+        }
+
+        function renderizarTabla() {
+            const cuerpo = document.getElementById('listaCuerpo');
+            const totalTxt = document.getElementById('tTotal');
+            const container = document.getElementById('hiddenInputsContainer');
+            const btn = document.getElementById('btnFinalizar');
+
+            cuerpo.innerHTML = '';
+            container.innerHTML = '';
+            let totalGeneral = 0;
+            btn.disabled = productosVenta.length === 0;
+
+            productosVenta.forEach((p, index) => {
+                const sub = p.precio * p.cantidad;
+                totalGeneral += sub;
+
+                cuerpo.innerHTML += `
+                    <tr>
+                        <td>${p.nombre}</td>
+                        <td>S/ ${p.precio.toFixed(2)}</td>
+                        <td>${p.cantidad}</td>
+                        <td>S/ ${sub.toFixed(2)}</td>
+                        <td><button type="button" onclick="eliminar(${index})" class="btn btn-sm btn-link text-danger"><i class="bi bi-trash"></i></button></td>
+                    </tr>`;
+
+                container.innerHTML += `
+                    <input type="hidden" name="items[${index}].producto_id" value="${p.id}" />
+                    <input type="hidden" name="items[${index}].cantidad" value="${p.cantidad}" />`;
+            });
+
+            totalTxt.innerText = totalGeneral.toFixed(2);
+        }
+    </script>
+}

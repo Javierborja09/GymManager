@@ -1,0 +1,38 @@
+﻿@model GymManager.Models.Usuario
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow border-0">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Crear Acceso de Usuario</h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Create">
+                    <div class="mb-3">
+                        <label asp-for="nombre" class="form-label">Nombre Completo</label>
+                        <input asp-for="nombre" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="email" class="form-label">Correo Electrónico</label>
+                        <input asp-for="email" type="email" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Contraseña Temporal</label>
+                        <input name="password" type="password" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="rol" class="form-label">Rol de Acceso</label>
+                        <select asp-for="rol" class="form-select">
+                            <option value="Vendedor">Vendedor (Caja/Ventas)</option>
+                            <option value="Admin">Administrador (Todo)</option>
+                        </select>
+                    </div>
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-light border">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">Registrar Usuario</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

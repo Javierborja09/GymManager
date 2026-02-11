@@ -1,0 +1,69 @@
+﻿@model IEnumerable<GymManager.Models.Venta>
+
+@{
+    ViewData["Title"] = "Historial de Ventas";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 animate__animated animate__fadeIn">
+    <h1 class="h3 mb-0 text-gray-800"><i class="bi bi-receipt-cutoff text-primary"></i> Historial de Ventas</h1>
+    <a asp-action="Create" class="btn btn-success rounded-pill px-4 shadow-sm">
+        <i class="bi bi-cart-plus-fill me-1"></i> Nueva Venta
+    </a>
+</div>
+
+<div class="card shadow border-0 animate__animated animate__fadeInUp">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th class="ps-3">ID</th>
+                    <th>Fecha</th>
+                    <th>Productos Vendidos</th> @* Nueva columna para nombres *@
+                    <th>Cliente</th>
+                    <th>Atendido por</th>
+                    <th class="text-end pe-3">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="ps-3 fw-bold text-primary">#@item.venta_id</td>
+                        <td>@item.fecha_venta.ToString("dd/MM/yyyy HH:mm")</td>
+
+                        @* Lógica para mostrar los productos del detalle *@
+                        <td>
+                            @if (item.DetalleVentas != null && item.DetalleVentas.Any())
+                            {
+                                @foreach (var detalle in item.DetalleVentas)
+                                {
+                                    <span class="badge bg-info text-dark border-info">
+                                        <i class="bi bi-box-seam me-1"></i>
+                                        @detalle.Producto?.nombre (@detalle.cantidad)
+                                    </span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted small italic">Sin productos</span>
+                            }
+                        </td>
+
+                        <td>
+                            <i class="bi bi-person-circle me-1 text-secondary"></i>
+                            @(item.Cliente?.nombre ?? "Público General")
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border">
+                                <i class="bi bi-person-badge me-1"></i> @item.Usuario?.nombre
+                            </span>
+                        </td>
+                        <td class="text-end pe-3 fw-bold text-success">
+                            S/ @item.total_venta.ToString("N2")
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

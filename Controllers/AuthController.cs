@@ -43,34 +43,46 @@ namespace GymManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(string email, string password)
         {
+            // 1. Buscamos al usuario solo por email para verificar su existencia primero
             var usuario = await _context.Usuarios
-                .FirstOrDefaultAsync(u => u.email == email && u.activo == true);
+                .FirstOrDefaultAsync(u => u.email == email);
 
-            if (usuario != null)
+            if (usuario == null)
             {
-                var resultado = _passwordHasher.VerifyHashedPassword(usuario, usuario.password_hash, password);
-
-                if (resultado == PasswordVerificationResult.Success)
-                {
-                    var claims = new List<Claim>
-                    {
-                        new Claim(ClaimTypes.Name, usuario.nombre),
-                        new Claim(ClaimTypes.Email, usuario.email),
-                        new Claim(ClaimTypes.Role, usuario.rol),
-                        new Claim("UsuarioId", usuario.usuario_id.ToString())
-                    };
-
-                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
-                        new ClaimsPrincipal(claimsIdentity));
-
-                    // 3. Siempre redirigir al Dashboard para asegurar limpieza
-                    return RedirectToAction("Index", "Dashboard");
-                }
+                ViewBag.Error = "El correo electrónico no está registrado.";
+                return View();
             }
 
-            ViewBag.Error = "Credenciales incorrectas o cuenta inactiva.";
+            // 2. Verificamos si la cuenta está desactivada
+            if (!usuario.activo)
+            {
+                ViewBag.Error = "Tu cuenta ha sido desactivada. Contacta al administrador.";
+                return View();
+            }
+
+            // 3. Verificamos la contraseña
+            var resultado = _passwordHasher.VerifyHashedPassword(usuario, usuario.password_hash, password);
+
+            if (resultado == PasswordVerificationResult.Success)
+            {
+                var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.Name, usuario.nombre),
+            new Claim(ClaimTypes.Email, usuario.email),
+            new Claim(ClaimTypes.Role, usuario.rol),
+            new Claim("UsuarioId", usuario.usuario_id.ToString())
+        };
+
+                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(claimsIdentity));
+
+                return RedirectToAction("Index", "Dashboard");
+            }
+
+            // 4. Si llegó aquí, la contraseña es incorrecta
+            ViewBag.Error = "Contraseña incorrecta.";
             return View();
         }
 

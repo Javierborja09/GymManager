@@ -1,7 +1,6 @@
 ﻿using GymManager.Models;
 using GymManager.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
-using System.Numerics;
 
 namespace GymManager.Data
 {
@@ -23,22 +22,24 @@ namespace GymManager.Data
         public DbSet<Asistencia> Asistencias { get; set; }
 
 
+        public DbSet<MetaMensual> MetasMensuales { get; set; }
+
+        // --- DTOs PARA REPORTES ---
         public virtual DbSet<ReporteIngresoDTO> ReporteIngresos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // 1. CONFIGURACIÓN DE LLAVES PRIMARIAS (IDENTITY)=
-            // 2. CONFIGURACIÓN DE DETALLE DE VENTAS (Columna calculada)
+            // 1. CONFIGURACIÓN DE DETALLE DE VENTAS (Columna calculada en SQL)
             modelBuilder.Entity<DetalleVenta>(entity =>
             {
-                entity.ToTable("DetalleVentas");
-                entity.Property(d => d.subtotal)
-                    .HasComputedColumnSql("[cantidad] * [precio_unitario]");
+                entity.HasOne<Venta>() 
+                    .WithMany(v => v.DetalleVentas) 
+                    .HasForeignKey(d => d.venta_id);
             });
 
-            // 3. RELACIONES
+            // 2. RELACIONES
             modelBuilder.Entity<Venta>()
                 .HasOne(v => v.Usuario)
                 .WithMany()
@@ -49,29 +50,54 @@ namespace GymManager.Data
                 .WithMany()
                 .HasForeignKey(m => m.cliente_id);
 
-            // 4. CONFIGURACIÓN DE DTOs (Sin tabla física)
+            // 3. CONFIGURACIÓN DE DTOs (Sin tabla física)
             modelBuilder.Entity<ReporteIngresoDTO>(entity => {
                 entity.HasNoKey();
                 entity.ToView(null);
             });
         }
 
-        // --- PROCEDIMIENTOS ALMACENADOS ACTUALIZADOS ---
+        // --- LLAMADAS A PROCEDIMIENTOS ALMACENADOS NUEVOS ---
 
         public async Task<int> RegistrarClienteSP(string dni, string nombre, string apellido, string tel, string email)
         {
             return await Database.ExecuteSqlInterpolatedAsync(
                 $"EXEC sp_RegistrarCliente @dni={dni}, @nombre={nombre}, @apellido={apellido}, @telefono={tel}, @email={email}");
         }
-        public async Task<int> RegistrarVentaSP(long? clienteId, long usuarioId, decimal total)
+
+        // Gestión de Productos (Crea o Actualiza)
+        public async Task<int> GuardarProductoSP(long? id, string nombre, decimal precio, int stock, string cat)
         {
             return await Database.ExecuteSqlInterpolatedAsync(
-                $"EXEC sp_RegistrarVenta @cliente_id={clienteId}, @usuario_id={usuarioId}, @total={total}");
+                $"EXEC sp_GuardarProducto @producto_id={id}, @nombre={nombre}, @precio_venta={precio}, @stock_actual={stock}, @categoria={cat}");
         }
+
+        // Registro de Venta con Descuento de Stock Automático
+        public async Task RegistrarVentaJsonSP(long? clienteId, long usuarioId, decimal total, string jsonProductos)
+        {
+            await Database.ExecuteSqlInterpolatedAsync(
+                $"EXEC sp_RegistrarVentaJson @cliente_id={clienteId}, @usuario_id={usuarioId}, @total_venta={total}, @productos_json={jsonProductos}");
+        }
+
+        // Registro de Matrícula (Membresía)
+        public async Task<int> RegistrarMatriculaSP(long clienteId, long planId, decimal monto)
+        {
+            return await Database.ExecuteSqlInterpolatedAsync(
+                $"EXEC sp_RegistrarMatricula @cliente_id={clienteId}, @plan_id={planId}, @monto={monto}");
+        }
+
+        // Control de Asistencia por DNI
+        public async Task<int> RegistrarAsistenciaSP(string dni)
+        {
+            return await Database.ExecuteSqlInterpolatedAsync(
+                $"EXEC sp_RegistrarAsistencia @dni={dni}");
+        }
+
+        // Reportes de Ingresos
         public async Task<List<ReporteIngresoDTO>> ObtenerReporteIngresosSP(DateTime inicio, DateTime fin)
         {
             return await ReporteIngresos
-                .FromSqlInterpolated($"EXEC sp_ReporteIngresos @fechaInicio={inicio.ToString("yyyy-MM-dd")}, @fechaFin={fin.ToString("yyyy-MM-dd")}")
+                .FromSqlInterpolated($"EXEC sp_ReporteIngresos @fechaInicio={inicio:yyyy-MM-dd}, @fechaFin={fin:yyyy-MM-dd}")
                 .ToListAsync();
         }
     }

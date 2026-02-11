@@ -1,0 +1,57 @@
+﻿@model GymManager.Models.Plan
+
+@{
+    ViewData["Title"] = "Editar Plan";
+}
+
+<div class="row justify-content-center animate__animated animate__fadeIn">
+    <div class="col-md-5">
+        <div class="card shadow border-0 mt-5">
+            <div class="card-header bg-warning text-dark p-3">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-pencil-square me-2"></i>Modificar Plan</h5>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Edit">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    @* Campo oculto para el ID necesario para la actualización *@
+                    <input type="hidden" asp-for="plan_id" />
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nombre del Plan</label>
+                        <input asp-for="nombre_plan" class="form-control shadow-sm" required />
+                        <span asp-validation-for="nombre_plan" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Días de Duración</label>
+                            <input asp-for="duracion_dias" type="number" class="form-control shadow-sm" required />
+                            <span asp-validation-for="duracion_dias" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-bold">Precio (S/)</label>
+                            <input asp-for="precio" type="number" step="0.01" class="form-control shadow-sm" required />
+                            <span asp-validation-for="precio" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-warning fw-bold shadow">
+                            <i class="bi bi-save me-1"></i> Guardar Cambios
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

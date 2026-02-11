@@ -23,5 +23,6 @@ namespace GymManager.Models
 
         [ForeignKey("usuario_id")]
         public virtual Usuario? Usuario { get; set; }
+        public virtual ICollection<DetalleVenta> DetalleVentas { get; set; } = new List<DetalleVenta>();
     }
 }

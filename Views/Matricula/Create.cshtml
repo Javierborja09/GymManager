@@ -1,0 +1,61 @@
+﻿@model GymManager.Models.Matricula
+
+<div class="row justify-content-center animate__animated animate__fadeIn">
+    <div class="col-md-6">
+        <div class="card shadow border-0">
+            <div class="card-header bg-primary text-white p-3">
+                <h5 class="mb-0"><i class="bi bi-card-checklist me-2"></i>Nueva Membresía</h5>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Create">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Seleccionar Socio</label>
+                        <select asp-for="cliente_id" class="form-select shadow-sm" required>
+                            <option value="">-- Buscar Cliente --</option>
+                            @foreach (var c in ViewBag.Clientes)
+                            {
+                                <option value="@c.cliente_id">@c.dni - @c.nombre @c.apellido</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Plan de Entrenamiento</label>
+                        <select asp-for="plan_id" class="form-select shadow-sm" required id="planSelect">
+                            <option value="">-- Seleccionar Plan --</option>
+                            @foreach (var p in ViewBag.Planes)
+                            {
+                                <option value="@p.plan_id" data-precio="@p.precio">
+                                    @p.nombre_plan (S/ @p.precio)
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="bg-light p-3 rounded mb-4 text-center border">
+                        <span class="text-muted">Monto a Cobrar:</span>
+                        <h2 class="text-primary fw-bold mb-0">S/ <span id="montoDisplay">0.00</span></h2>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg shadow">
+                            Activar Membresía
+                        </button>
+                        <a asp-action="Index" class="btn btn-link text-muted">Volver al listado</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Actualiza el monto visualmente según el plan elegido
+        document.getElementById('planSelect').addEventListener('change', function() {
+            const option = this.options[this.selectedIndex];
+            const precio = option.getAttribute('data-precio') || "0.00";
+            document.getElementById('montoDisplay').innerText = precio;
+        });
+    </script>
+}

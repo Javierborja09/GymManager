@@ -1,0 +1,55 @@
+﻿@model IEnumerable<GymManager.Models.MetaMensual>
+
+@{
+    ViewData["Title"] = "Seguimiento de Metas";
+}
+
+<div class="container animate__animated animate__fadeIn">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">
+            <i class="bi bi-graph-up-arrow text-success me-2"></i>
+            Seguimiento de Metas @ViewBag.Anio
+        </h2>
+        <span class="badge bg-dark px-3 py-2 rounded-pill">Año Actual</span>
+    </div>
+
+    <div class="row">
+        @foreach (var item in Model)
+        {
+            var porcentaje = item.objetivo_monto > 0 ? (item.RecaudadoReal / item.objetivo_monto) * 100 : 0;
+            var colorBarra = porcentaje >= 100 ? "bg-success" : (porcentaje >= 70 ? "bg-info" : "bg-warning");
+            var nombreMes = System.Globalization.DateTimeFormatInfo.CurrentInfo.GetMonthName(item.mes).ToUpper();
+
+            <div class="col-md-4 mb-4">
+                <div class="card shadow border-0 h-100 position-relative">
+                    @* Botón de Edición Rápida *@
+                    <a asp-action="Edit" asp-route-id="@item.meta_id"
+                       class="position-absolute top-0 end-0 m-3 text-primary" title="Ajustar Meta">
+                        <i class="bi bi-pencil-square"></i>
+                    </a>
+
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-1">@nombreMes</h5>
+                        <p class="text-muted small mb-3">@item.descripcion</p>
+
+                        <div class="d-flex justify-content-between mb-1 small">
+                            <span>Recaudado: <strong>S/ @item.RecaudadoReal.ToString("N2")</strong></span>
+                            <span>Meta: <strong>S/ @item.objetivo_monto.ToString("N2")</strong></span>
+                        </div>
+
+                        <div class="progress mb-2" style="height: 12px; border-radius: 10px;">
+                            <div class="progress-bar @colorBarra progress-bar-striped progress-bar-animated"
+                                 role="progressbar" style="width: @(porcentaje > 100 ? 100 : porcentaje)%"></div>
+                        </div>
+
+                        <div class="text-end">
+                            <span class="badge @(porcentaje >= 100 ? "bg-success" : "bg-light text-dark border")">
+                                @porcentaje.ToString("N1")% de la meta
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
