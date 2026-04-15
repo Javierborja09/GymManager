@@ -18,12 +18,5 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Images\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\GymManager.BL.BE\GymManager.BL.BE.csproj" />
-  </ItemGroup>
 
 </Project>

@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36518.9
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GymManager.Web", "GymManager.Web.csproj", "{72EA5C60-47E4-4CDF-8E24-C415F858D897}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GymManager.PL.WebApp", "GymManager.PL.WebApp\GymManager.PL.WebApp.csproj", "{72EA5C60-47E4-4CDF-8E24-C415F858D897}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GymManager.BL.BC", "..\GymManager.BL.BC\GymManager.BL.BC.csproj", "{7B7502D5-9A46-476C-80AB-3CA37A31DB48}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GymManager.BL.BE", "GymManager.BL.BE\GymManager.BL.BE.csproj", "{648B9F43-B030-4C22-828B-FBC6F40FD229}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GymManager.BL.BE", "..\GymManager.BL.BE\GymManager.BL.BE.csproj", "{4F76ECB2-A9C8-42FB-AADC-E55DB7909C0F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GymManager.BL.BC", "GymManager.BL.BC\GymManager.BL.BC.csproj", "{21EFBB77-B1CE-415E-844B-54C7A5A7E0AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GymManager.DL.DALC", "..\GymManager.DL.DALC\GymManager.DL.DALC.csproj", "{CCC7C841-D270-4AC1-A310-3D7FAB5E63F9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GymManager.DL.DALC", "GymManager.DL.DALC\GymManager.DL.DALC.csproj", "{C7D424A5-5AAE-4C67-9A1D-0F840CB82BDC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,18 +21,18 @@ Global
 		{72EA5C60-47E4-4CDF-8E24-C415F858D897}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{72EA5C60-47E4-4CDF-8E24-C415F858D897}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{72EA5C60-47E4-4CDF-8E24-C415F858D897}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7B7502D5-9A46-476C-80AB-3CA37A31DB48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7B7502D5-9A46-476C-80AB-3CA37A31DB48}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7B7502D5-9A46-476C-80AB-3CA37A31DB48}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7B7502D5-9A46-476C-80AB-3CA37A31DB48}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4F76ECB2-A9C8-42FB-AADC-E55DB7909C0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4F76ECB2-A9C8-42FB-AADC-E55DB7909C0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4F76ECB2-A9C8-42FB-AADC-E55DB7909C0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4F76ECB2-A9C8-42FB-AADC-E55DB7909C0F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CCC7C841-D270-4AC1-A310-3D7FAB5E63F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CCC7C841-D270-4AC1-A310-3D7FAB5E63F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CCC7C841-D270-4AC1-A310-3D7FAB5E63F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CCC7C841-D270-4AC1-A310-3D7FAB5E63F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{648B9F43-B030-4C22-828B-FBC6F40FD229}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{648B9F43-B030-4C22-828B-FBC6F40FD229}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{648B9F43-B030-4C22-828B-FBC6F40FD229}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{648B9F43-B030-4C22-828B-FBC6F40FD229}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21EFBB77-B1CE-415E-844B-54C7A5A7E0AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21EFBB77-B1CE-415E-844B-54C7A5A7E0AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21EFBB77-B1CE-415E-844B-54C7A5A7E0AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21EFBB77-B1CE-415E-844B-54C7A5A7E0AA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7D424A5-5AAE-4C67-9A1D-0F840CB82BDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7D424A5-5AAE-4C67-9A1D-0F840CB82BDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7D424A5-5AAE-4C67-9A1D-0F840CB82BDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7D424A5-5AAE-4C67-9A1D-0F840CB82BDC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
