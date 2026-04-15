@@ -36,6 +36,8 @@ namespace GymManager.Controllers
         [HttpGet]
         public IActionResult AccessDenied()
         {
+
+            //yo samuel modique esto
             return View();
         }
 
