@@ -1,4 +1,6 @@
-﻿using GymManager.Data;
+﻿using GymManager.BL.BC;
+using GymManager.BL.BE;
+using GymManager.Data;
 using GymManager.Models;
 using GymManager.Web.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
@@ -10,25 +12,25 @@ namespace GymManager.Controllers
     [Authorize(Roles = "Admin")]
     public class PlanController : Controller
     {
-        private readonly DBConnection _context;
-
-        public PlanController(DBConnection context)
+        private readonly PlanBC _planBC;
+        public PlanController(PlanBC planBC)
         {
-            _context = context;
+           _planBC = planBC;
         }
 
         // Listado de planes actuales
         public async Task<IActionResult> Index()
         {
-            var planesDto = await _context.Planes
-                .Select(p => new PlanDTO
-                {
-                    PlanId = p.plan_id,
-                    NombrePlan = p.nombre_plan,
-                    DuracionDias = p.duracion_dias,
-                    Precio = p.precio
-                })
-                .ToListAsync();
+            var planes = await _planBC.Listar();
+
+            // Mapeo a DTO para la vista
+            var planesDto = planes.Select(p => new PlanDTO
+            {
+                PlanId = p.plan_id,
+                NombrePlan = p.nombre_plan,
+                DuracionDias = p.duracion_dias,
+                Precio = p.precio
+            }).ToList();
 
             return View(planesDto);
         }
@@ -41,43 +43,52 @@ namespace GymManager.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult>
-            Create(Plan plan)
+        public async Task<IActionResult> Create(PlanBE planBE)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(plan);
-                await _context.SaveChangesAsync();
-                TempData["Success"] = "Nuevo plan de entrenamiento creado.";
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    await _planBC.Guardar(planBE);
+                    TempData["Success"] = "Nuevo plan de entrenamiento creado.";
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", ex.Message);
+                }
             }
-            return View(plan);
+            return View(planBE);
         }
 
         // GET: Plan/Edit/5
-        public async Task<IActionResult>
-            Edit(long? id)
+        public async Task<IActionResult> Edit(long? id)
         {
             if (id == null) return NotFound();
-            var plan = await _context.Planes.FindAsync(id);
+            var plan = await _planBC.ObtenerPorID(id.Value);
             if (plan == null) return NotFound();
             return View(plan);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult>
-            Edit(long id, Plan plan)
+        public async Task<IActionResult> Edit(long id, PlanBE planBE)
         {
-            if (id != plan.plan_id) return NotFound();
+            if (id != planBE.plan_id) return NotFound();
 
             if (ModelState.IsValid)
             {
-                _context.Update(plan);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    await _planBC.Guardar(planBE);
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", ex.Message);
+                }
             }
-            return View(plan);
+            return View(planBE);
         }
     }
 }

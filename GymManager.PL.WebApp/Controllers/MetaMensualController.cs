@@ -1,52 +1,40 @@
-﻿using GymManager.Data;
+﻿using GymManager.BL.BC;
+using GymManager.BL.BE;
+using GymManager.Data;
 using GymManager.Models;
 using GymManager.Web.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore; 
+using Microsoft.EntityFrameworkCore;
 
 namespace GymManager.Controllers
 {
     [Authorize(Roles = "Admin")]
     public class MetaMensualController : Controller
     {
-        private readonly DBConnection _context;
+        private readonly MetasMensualesBC _metaBC;
 
-        public MetaMensualController(DBConnection context) { _context = context; }
+        public MetaMensualController(MetasMensualesBC metaBC)
+        {
+            _metaBC = metaBC;
+        }
 
         public async Task<IActionResult> Index()
         {
             int anioActual = DateTime.Now.Year;
+            var metas = await _metaBC.ListarMetasConProgreso(anioActual);
 
-            var metasBase = await _context.MetasMensuales
-                .Where(m => m.anio == anioActual)
-                .OrderBy(m => m.mes)
-                .ToListAsync();
-
-            var metasDto = new List<MetaMensualDTO>();
-
-            foreach (var meta in metasBase)
+            // Mapeo al DTO
+            var metasDto = metas.Select(m => new MetaMensualDTO
             {
-                // Sumamos ingresos de Matrículas y Ventas de productos
-                var totalMatriculas = await _context.Matriculas
-                    .Where(m => m.fecha_inicio.Month == meta.mes && m.fecha_inicio.Year == anioActual)
-                    .SumAsync(m => (decimal?)m.monto_pagado) ?? 0;
-
-                var totalVentas = await _context.Ventas
-                    .Where(v => v.fecha_venta.Month == meta.mes && v.fecha_venta.Year == anioActual)
-                    .SumAsync(v => (decimal?)v.total_venta) ?? 0;
-
-                metasDto.Add(new MetaMensualDTO
-                {
-                    MetaId = meta.meta_id,
-                    Mes = meta.mes,
-                    Anio = meta.anio,
-                    MesNombre = System.Globalization.DateTimeFormatInfo.CurrentInfo.GetMonthName(meta.mes).ToUpper(),
-                    ObjetivoMonto = meta.objetivo_monto,
-                    RecaudadoReal = totalMatriculas + totalVentas,
-                    Descripcion = meta.descripcion
-                });
-            }
+                MetaId = m.meta_id,
+                Mes = m.mes,
+                Anio = m.anio,
+                MesNombre = System.Globalization.DateTimeFormatInfo.CurrentInfo.GetMonthName(m.mes).ToUpper(),
+                ObjetivoMonto = m.objetivo_monto,
+                RecaudadoReal = m.RecaudadoReal,
+                Descripcion = m.descripcion
+            }).ToList();
 
             ViewBag.Anio = anioActual;
             return View(metasDto);
@@ -55,20 +43,27 @@ namespace GymManager.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
-            var meta = await _context.MetasMensuales.FindAsync(id);
+            var meta = await _metaBC.ObtenerPorId(id.Value);
             return meta == null ? NotFound() : View(meta);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, MetaMensual meta)
+        public async Task<IActionResult> Edit(int id, MetasMensualesBE meta)
         {
             if (id != meta.meta_id) return NotFound();
+
             if (ModelState.IsValid)
             {
-                _context.Update(meta);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    await _metaBC.ActualizarMeta(meta);
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", ex.Message);
+                }
             }
             return View(meta);
         }

@@ -1,4 +1,6 @@
-﻿using GymManager.Data;
+﻿using GymManager.BL.BC;
+using GymManager.BL.BE;
+using GymManager.Data;
 using GymManager.Models;
 using GymManager.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
@@ -10,27 +12,20 @@ namespace GymManager.Controllers
     [Authorize(Roles = "Admin")] 
     public class ProductoController : Controller
     {
-        private readonly DBConnection _context;
+        private readonly ProductosBC _productosBC;
 
-        public ProductoController(DBConnection context)
+        public ProductoController(ProductosBC productosBC)
         {
-            _context = context;
+            _productosBC = productosBC;
         }
 
         // GET: Producto
         // Lista todos los productos y permite búsqueda opcional
         public async Task<IActionResult> Index(string buscar)
         {
-            var query = _context.Productos.AsQueryable();
+            var query = await _productosBC.Listar(buscar);
 
-            if (!string.IsNullOrEmpty(buscar))
-            {
-                query = query.Where(p => p.nombre.Contains(buscar) || p.categoria.Contains(buscar));
-            }
-
-            // Proyección directa al DTO para mejorar el rendimiento
-            var productosDto = await query
-                .Select(p => new ProductoDTO
+            var productosDto = query.Select(p => new ProductoDTO
                 {
                     ProductoId = p.producto_id,
                     Nombre = p.nombre,
@@ -38,8 +33,7 @@ namespace GymManager.Controllers
                     StockActual = p.stock_actual,
                     Categoria = p.categoria
                 })
-                .ToListAsync();
-
+                .ToList();
             return View(productosDto);
         }
 
@@ -52,14 +46,13 @@ namespace GymManager.Controllers
         // POST: Producto/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Producto producto)
+        public async Task<IActionResult> Create(ProductoBE productoBE)
         {
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Add(producto);
-                    await _context.SaveChangesAsync();
+                    await _productosBC.GuardarProducto(productoBE);
                     return RedirectToAction(nameof(Index));
                 }
                 catch (Exception ex)
@@ -67,68 +60,64 @@ namespace GymManager.Controllers
                     ModelState.AddModelError("", "No se pudo guardar el producto: " + ex.Message);
                 }
             }
-            return View(producto);
+            return View(productoBE);
         }
 
-        // GET: Producto/Edit/5
+        // GET: Producto/Edit/{id}
         public async Task<IActionResult> Edit(long? id)
         {
             if (id == null) return NotFound();
 
-            var producto = await _context.Productos.FindAsync(id);
+            var producto = await _productosBC.ObtenerPorID(id);
             if (producto == null) return NotFound();
 
             return View(producto);
         }
 
-        // POST: Producto/Edit/5
+        // POST: Producto/Edit/
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(long id, Producto producto)
+        public async Task<IActionResult> Edit(long id, ProductoBE productoBE)
         {
-            if (id != producto.producto_id) return NotFound();
+            if (id != productoBE.producto_id) return NotFound();
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(producto);
-                    await _context.SaveChangesAsync();
+                    await _productosBC.GuardarProducto(productoBE);
                     return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (Exception ex)
                 {
-                    if (!_context.Productos.Any(e => e.producto_id == producto.producto_id)) return NotFound();
-                    else throw;
+                    ModelState.AddModelError("", "No se pudo actualizar el producto: " + ex.Message);
                 }
             }
-            return View(producto);
+            return View(productoBE);
         }
 
-        // GET: Producto/Details/5
+        // GET: Producto/Details/
         public async Task<IActionResult> Details(long? id)
         {
             if (id == null) return NotFound();
 
-            var producto = await _context.Productos
-                .FirstOrDefaultAsync(m => m.producto_id == id);
+            var producto = await _productosBC.ObtenerPorID(id);
 
             if (producto == null) return NotFound();
 
             return View(producto);
         }
 
-        // POST: Producto/Delete/5
+        // POST: Producto/Delete/
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(long id)
         {
-            var producto = await _context.Productos.FindAsync(id);
+            var producto = await _productosBC.ObtenerPorID(id);
             if (producto != null)
             {
-                _context.Productos.Remove(producto);
-                await _context.SaveChangesAsync();
+                await _productosBC.Eliminar(id);
             }
             return RedirectToAction(nameof(Index));
         }

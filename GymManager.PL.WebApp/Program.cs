@@ -1,6 +1,7 @@
+using GymManager.BL.BC;
 using GymManager.Data;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 
 namespace GymManager.Web
 {
@@ -14,6 +15,11 @@ namespace GymManager.Web
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
             builder.Services.AddDbContext<DBConnection>(options =>
                 options.UseSqlServer(connectionString));
+
+            builder.Services.AddScoped<ProductosBC>(sp => new ProductosBC(connectionString));
+            builder.Services.AddScoped<PlanBC>(sp => new PlanBC(connectionString));
+            builder.Services.AddScoped<MetasMensualesBC>(sp => new MetasMensualesBC(connectionString));
+
 
             // 2. CONFIGURACIÓN DE AUTENTICACIÓN POR COOKIES
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

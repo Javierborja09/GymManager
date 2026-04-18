@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\GymManager.BL.BE\GymManager.BL.BE.csproj" />
+    <ProjectReference Include="..\GymManager.DL.DALC\GymManager.DL.DALC.csproj" />
+  </ItemGroup>
+
 </Project>
