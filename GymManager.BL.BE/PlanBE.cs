@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GymManager.BL.BE
 {
-    
     public class PlanBE
     {
         [Key]

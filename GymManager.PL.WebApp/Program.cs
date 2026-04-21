@@ -19,6 +19,9 @@ namespace GymManager.Web
             builder.Services.AddScoped<ProductosBC>(sp => new ProductosBC(connectionString));
             builder.Services.AddScoped<PlanBC>(sp => new PlanBC(connectionString));
             builder.Services.AddScoped<MetasMensualesBC>(sp => new MetasMensualesBC(connectionString));
+            builder.Services.AddScoped<ClienteBC>(sp => new ClienteBC(connectionString));
+            builder.Services.AddScoped<MatriculaBC>(sp => new MatriculaBC(connectionString));
+            builder.Services.AddScoped<VentaBC>(sp => new VentaBC(connectionString));
 
 
             // 2. CONFIGURACIÓN DE AUTENTICACIÓN POR COOKIES

@@ -33,5 +33,20 @@ namespace GymManager.DL.DALC
                 }
             }
         }
+        
+        public async Task<decimal> ObtenerTotalPorFecha(DateTime fecha)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand("sp_ObtenerRecaudacionVentasPorFecha", conn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@fecha", fecha.Date);
+                    await conn.OpenAsync();
+
+                    return (decimal)await cmd.ExecuteScalarAsync();
+                }
+            }
+        }
     }
 }

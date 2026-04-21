@@ -4,7 +4,7 @@ GO
 -- ============================================================
 -- PRODUCTOS
 -- ============================================================
-
+-- Listar Productos con filtro
 CREATE OR ALTER PROCEDURE sp_ListarProductos
     @buscar VARCHAR(100) = NULL
 AS
@@ -16,18 +16,6 @@ BEGIN
            OR categoria LIKE '%' + @buscar + '%')
 END
 GO
-CREATE OR ALTER PROCEDURE sp_ProductoPorID
-    @producto_id INT
-AS
-BEGIN
-    SELECT producto_id, nombre, precio_venta, stock_actual, categoria
-    FROM Productos
-    WHERE (@buscar IS NULL 
-           OR nombre LIKE '%' + @buscar + '%' 
-           OR categoria LIKE '%' + @buscar + '%')
-END
-GO
-
 
 -- Obtener por ID
 CREATE OR ALTER PROCEDURE sp_ObtenerProductoPorId
@@ -155,6 +143,59 @@ GO
 -- ============================================================
 -- Matricula
 -- ============================================================
+-- 1. Listar Matrículas 
+CREATE OR ALTER PROCEDURE sp_ListarMatriculas
+AS
+BEGIN
+    SELECT 
+        m.matricula_id,
+        c.nombre,
+        c.apellido, 
+        c.dni,
+        p.nombre_plan,
+        m.fecha_inicio,
+        m.fecha_fin,
+        m.monto_pagado
+    FROM Matriculas m
+    INNER JOIN Clientes c ON m.cliente_id = c.cliente_id
+    INNER JOIN Planes p ON m.plan_id = p.plan_id
+    ORDER BY m.fecha_inicio DESC;
+END
+GO
+
+
+-- 2. Obtener Matrículas por id
+CREATE OR ALTER PROCEDURE sp_ObtenerMatriculaPorId
+    @matricula_id BIGINT
+AS
+BEGIN
+    SELECT 
+        m.matricula_id, m.cliente_id, m.plan_id, m.fecha_inicio, m.fecha_fin, m.monto_pagado,
+        c.nombre, c.apellido, c.dni, c.telefono,
+        p.nombre_plan
+    FROM Matriculas m
+    INNER JOIN Clientes c ON m.cliente_id = c.cliente_id
+    INNER JOIN Planes p ON m.plan_id = p.plan_id
+    WHERE m.matricula_id = @matricula_id;
+END
+GO
+
+-- 3. Insertar Nueva Matrícula
+CREATE OR ALTER PROCEDURE sp_InsertarMatricula
+    @cliente_id BIGINT,
+    @plan_id BIGINT,
+    @fecha_inicio DATE,
+    @fecha_fin DATE,
+    @monto_pagado DECIMAL(10,2)
+AS
+BEGIN
+    INSERT INTO Matriculas (cliente_id, plan_id, fecha_inicio, fecha_fin, monto_pagado)
+    VALUES (@cliente_id, @plan_id, @fecha_inicio, @fecha_fin, @monto_pagado);
+
+END
+GO
+
+
 -- Total recaudado por matrículas en un mes/año
 CREATE OR ALTER PROCEDURE sp_ObtenerTotalMatriculasMensual
     @mes INT,
@@ -183,3 +224,33 @@ BEGIN
 END
 GO
 
+-- Obtener recaudación de ventas de un día específico 
+CREATE OR ALTER PROCEDURE sp_ObtenerRecaudacionVentasPorFecha
+    @fecha DATE
+AS
+BEGIN
+    SELECT ISNULL(SUM(total_venta), 0)
+    FROM Ventas
+    WHERE CAST(fecha_venta AS DATE) = @fecha;
+END
+GO
+-- ============================================================
+-- Clientes
+-- ============================================================
+CREATE OR ALTER PROCEDURE sp_ListarClientes
+ @Dni VARCHAR(20) = NULL
+AS
+BEGIN
+    SELECT 
+       c.cliente_id,
+       c.dni,
+       c.nombre,
+       c.apellido,
+       c.telefono,
+       c.email,
+       c.estado
+    FROM Clientes c
+         WHERE (@Dni IS NULL 
+           OR dni LIKE '%' + @Dni + '%')
+END
+GO

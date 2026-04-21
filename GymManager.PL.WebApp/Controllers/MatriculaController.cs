@@ -1,4 +1,6 @@
-﻿using GymManager.Data;
+﻿using GymManager.BL.BC;
+using GymManager.BL.BE;
+using GymManager.Data;
 using GymManager.Models;
 using GymManager.Models.DTOs;
 using Microsoft.AspNetCore.Authorization;
@@ -10,20 +12,21 @@ namespace GymManager.Controllers
     [Authorize] // Requiere login para matricular
     public class MatriculaController : Controller
     {
-        private readonly DBConnection _context;
-
-        public MatriculaController(DBConnection context)
+        private readonly PlanBC _planBC;
+        private readonly MatriculaBC _matriculaBC;
+        private readonly ClienteBC _clienteBC;
+        public MatriculaController(MatriculaBC matriculaBC, PlanBC planBC, ClienteBC clienteBC)
         {
-            _context = context;
+            _matriculaBC = matriculaBC;
+            _planBC = planBC;
+            _clienteBC = clienteBC;
         }
 
         // Listado de membresías actuales
         public async Task<IActionResult> Index()
         {
-            var matriculasDto = await _context.Matriculas
-                .Include(m => m.Cliente)
-                .Include(m => m.Plan)
-                .OrderByDescending(m => m.fecha_inicio)
+            var listaMatriculas = await _matriculaBC.ListarMatriculas();
+            var matriculasDto = listaMatriculas
                 .Select(m => new MatriculaDTO
                 {
                     matricula_id = m.matricula_id,
@@ -34,7 +37,7 @@ namespace GymManager.Controllers
                     FechaFin = m.fecha_fin,
                     MontoPagado = m.monto_pagado
                 })
-                .ToListAsync();
+                .ToList();
 
             return View(matriculasDto);
         }
@@ -42,65 +45,44 @@ namespace GymManager.Controllers
         // Formulario de Nueva Matrícula
         public async Task<IActionResult> Create()
         {
-            ViewBag.Clientes = await _context.Clientes.Where(c => c.estado == "Activo").ToListAsync();
-            ViewBag.Planes = await _context.Planes.ToListAsync();
+            ViewBag.Clientes = await _clienteBC.ListarActivos();
+            ViewBag.Planes = await _planBC.Listar();
             return View();
         }
-        // GET: Matricula/Details/5
-        public async Task<IActionResult> Details(long? id)
-        {
-            if (id == null) return NotFound();
 
-            var matricula = await _context.Matriculas
-                .Include(m => m.Cliente)
-                .Include(m => m.Plan)
-                .FirstOrDefaultAsync(m => m.matricula_id == id);
-
-            if (matricula == null) return NotFound();
-
-            return View(matricula);
-        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Matricula matricula)
+        public async Task<IActionResult> Create(MatriculaBE matricula)
         {
             try
             {
-                // 1. Obtener datos del plan para calcular fechas y monto
-                var plan = await _context.Planes.FindAsync(matricula.plan_id);
-                if (plan == null) return NotFound();
 
-                // 2. Lógica de Negocio: Cálculo automático de fechas
-                matricula.fecha_inicio = DateTime.Now;
-                matricula.fecha_fin = matricula.fecha_inicio.AddDays(plan.duracion_dias);
-                matricula.monto_pagado = plan.precio;
+                await _matriculaBC.RegistrarMatricula(matricula);
 
-                if (ModelState.IsValid)
-                {
-                    _context.Add(matricula);
-                    await _context.SaveChangesAsync();
+                TempData["Success"] = "¡Membresía activada correctamente!";
+                return RedirectToAction(nameof(Index));
 
-                    // Opcional: Actualizar estado del cliente a Activo si era Inactivo
-                    var cliente = await _context.Clientes.FindAsync(matricula.cliente_id);
-                    if (cliente != null) cliente.estado = "Activo";
-                    await _context.SaveChangesAsync();
-
-                    TempData["Success"] = "¡Membresía activada correctamente!";
-                    return RedirectToAction(nameof(Index));
-                }
             }
             catch (Exception ex)
             {
                 ViewBag.Error = "Error al procesar la matrícula: " + ex.Message;
             }
 
-            ViewBag.Clientes = await _context.Clientes.ToListAsync();
-            ViewBag.Planes = await _context.Planes.ToListAsync();
+            ViewBag.Clientes = await _clienteBC.ListarActivos();
+            ViewBag.Planes = await _planBC.Listar();
             return View(matricula);
         }
+
+        // GET: Matricula/Details/5
+        public async Task<IActionResult> Details(long id)
+        {
+            // Obtenemos la entidad completa desde la BC
+            var matriculaBE = await _matriculaBC.ObtenerDetalleCompleto(id);
+
+            if (matriculaBE == null) return NotFound();
+
+            return View(matriculaBE);
+        }
     }
-    
-
-
 }

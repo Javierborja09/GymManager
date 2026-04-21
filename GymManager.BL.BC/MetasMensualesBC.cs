@@ -18,7 +18,7 @@ namespace GymManager.BL.BC
         private readonly MatriculaDALC _matriculaDalc; 
         private readonly VentasDALC _ventaDalc;
 
-        public MetasMensualesBC(string connectionString)//, DBConnection context)
+        public MetasMensualesBC(string connectionString)
         {
             _metaDalc = new MetaMenDALC(connectionString);
             _matriculaDalc = new MatriculaDALC(connectionString);
