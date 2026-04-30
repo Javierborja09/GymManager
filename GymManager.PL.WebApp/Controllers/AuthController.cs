@@ -1,94 +1,70 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using GymManager.BL.BC;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using GymManager.Data;
-using GymManager.Models;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace GymManager.Controllers
 {
     public class AuthController : Controller
     {
-        private readonly DBConnection _context;
-        private readonly PasswordHasher<Usuario> _passwordHasher;
+        private readonly UsuarioBC _usuarioBC;
 
-        public AuthController(DBConnection context)
+        public AuthController(IConfiguration configuration)
         {
-            _context = context;
-            _passwordHasher = new PasswordHasher<Usuario>();
+            _usuarioBC = new UsuarioBC(
+                configuration.GetConnectionString("DefaultConnection")!);
         }
 
         [HttpGet]
         public IActionResult Login(string returnUrl = null)
         {
-            if (User.Identity!.IsAuthenticated) return RedirectToAction("Index", "Dashboard");
+            if (User.Identity!.IsAuthenticated)
+                return RedirectToAction("Index", "Dashboard");
 
             if (!string.IsNullOrEmpty(returnUrl))
-            {
                 return RedirectToAction("Login");
-            }
 
             return View();
         }
 
         [HttpGet]
-        public IActionResult AccessDenied()
-        {
-            return View();
-        }
+        public IActionResult AccessDenied() => View();
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(string email, string password)
         {
-            // 1. Buscamos al usuario solo por email para verificar su existencia primero
-            var usuario = await _context.Usuarios
-                .FirstOrDefaultAsync(u => u.email == email);
+            var (usuario, error) = await _usuarioBC.ValidarCredenciales(email, password);
 
-            if (usuario == null)
+            if (error != null)
             {
-                ViewBag.Error = "El correo electrónico no está registrado.";
+                ViewBag.Error = error;
                 return View();
             }
 
-            // 2. Verificamos si la cuenta está desactivada
-            if (!usuario.activo)
+            var claims = new List<Claim>
             {
-                ViewBag.Error = "Tu cuenta ha sido desactivada. Contacta al administrador.";
-                return View();
-            }
+                new Claim(ClaimTypes.Name,  usuario!.nombre),
+                new Claim(ClaimTypes.Email, usuario.email),
+                new Claim(ClaimTypes.Role,  usuario.rol),
+                new Claim("UsuarioId",      usuario.usuario_id.ToString())
+            };
 
-            // 3. Verificamos la contraseña
-            var resultado = _passwordHasher.VerifyHashedPassword(usuario, usuario.password_hash, password);
+            var identity = new ClaimsIdentity(
+                claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-            if (resultado == PasswordVerificationResult.Success)
-            {
-                var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, usuario.nombre),
-            new Claim(ClaimTypes.Email, usuario.email),
-            new Claim(ClaimTypes.Role, usuario.rol),
-            new Claim("UsuarioId", usuario.usuario_id.ToString())
-        };
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(identity));
 
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(claimsIdentity));
-
-                return RedirectToAction("Index", "Dashboard");
-            }
-
-            // 4. Si llegó aquí, la contraseña es incorrecta
-            ViewBag.Error = "Contraseña incorrecta.";
-            return View();
+            return RedirectToAction("Index", "Dashboard");
         }
 
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignOutAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login");
         }
     }
