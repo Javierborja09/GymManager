@@ -1,52 +1,58 @@
 ﻿@model GymManager.BL.BE.ClienteBE
 
 @{
-    ViewData["Title"] = "Nuevo Cliente";
+    ViewData["Title"] = "Nuevo Socio";
 }
 
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card shadow-lg border-0">
             <div class="card-header bg-primary text-white p-3">
-                <h5 class="mb-0"><i class="bi bi-person-plus"></i> Formulario de Registro</h5>
+                <h5 class="mb-0"><i class="bi bi-person-plus"></i> Registro de Nuevo Socio</h5>
             </div>
             <div class="card-body p-4">
-                <form asp-action="Create">
+                <form asp-action="Create" id="formRegistro">
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">DNI</label>
-                            <input asp-for="dni" class="form-control" placeholder="Ej: 70654321" required />
+                            <div class="input-group">
+                                <input asp-for="dni" id="txtDni" class="form-control" placeholder="8 dígitos" required maxlength="8" />
+                                <button class="btn btn-outline-primary" type="button" id="btnConsultarApi">
+                                    <span id="loader" class="spinner-border spinner-border-sm d-none" role="status"></span>
+                                    <i id="iconSearch" class="bi bi-search"></i> Consultar
+                                </button>
+                            </div>
                             <span asp-validation-for="dni" class="text-danger"></span>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">Nombre</label>
-                            <input asp-for="nombre" class="form-control" placeholder="Nombre del cliente" required />
+                            <input asp-for="nombre" id="txtNombre" class="form-control" placeholder="Cargando..." required readonly />
                             <span asp-validation-for="nombre" class="text-danger"></span>
                         </div>
                     </div>
 
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-bold">Apellido</label>
-                            <input asp-for="apellido" class="form-control" placeholder="Apellido del cliente" required />
+                            <label class="form-label fw-bold">Apellidos</label>
+                            <input asp-for="apellido" id="txtApellido" class="form-control" placeholder="Cargando..." required readonly />
                             <span asp-validation-for="apellido" class="text-danger"></span>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-bold">Teléfono</label>
-                            <input asp-for="telefono" class="form-control" placeholder="987..." />
+                            <input asp-for="telefono" class="form-control" placeholder="987654321" />
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-bold">Correo Electrónico</label>
-                        <input asp-for="email" type="email" class="form-control" placeholder="cliente@correo.com" />
+                        <input asp-for="email" type="email" class="form-control" placeholder="ejemplo@correo.com" />
                     </div>
 
                     <div class="d-flex justify-content-between mt-4">
-                        <a asp-action="Index" class="btn btn-secondary px-4">Cancelar</a>
-                        <button type="submit" class="btn btn-primary px-5 shadow">Guardar Socio</button>
+                        <a asp-action="Index" class="btn btn-light px-4 border">Volver</a>
+                        <button type="submit" class="btn btn-primary px-5 shadow">Finalizar Registro</button>
                     </div>
                 </form>
             </div>
@@ -55,6 +61,58 @@
 </div>
 
 @section Scripts {
+    <script>
+        document.getElementById('btnConsultarApi').addEventListener('click', async () => {
+            const dni = document.getElementById('txtDni').value;
+            const btn = document.getElementById('btnConsultarApi');
+            const loader = document.getElementById('loader');
+            const icon = document.getElementById('iconSearch');
+
+            if (dni.length !== 8) {
+                alert("Por favor, ingrese un DNI válido (8 dígitos).");
+                return;
+            }
+
+            // UI Feedback: Desactivar botón y mostrar carga
+            btn.disabled = true;
+            loader.classList.remove('d-none');
+            icon.classList.add('d-none');
+
+            try {
+                const response = await fetch('https://apiperu.dev/api/dni', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer a9b1cdfd20e05e0b8962177817ba6ad976781a5df3741bf4362a444bc29dc7c2'
+                    },
+                    body: JSON.stringify({ dni: dni })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Llenar campos automáticamente
+                    document.getElementById('txtNombre').value = result.data.nombres;
+                    document.getElementById('txtApellido').value = `${result.data.apellido_paterno} ${result.data.apellido_materno}`;
+
+                    // Quitar readonly si se desea permitir edición manual tras la búsqueda
+                    document.getElementById('txtNombre').readOnly = false;
+                    document.getElementById('txtApellido').readOnly = false;
+                } else {
+                    alert("No se encontró información para el DNI ingresado.");
+                }
+            } catch (error) {
+                alert("Error al conectar con el servicio de DNI.");
+                console.error(error);
+            } finally {
+                // UI Feedback: Restaurar botón
+                btn.disabled = false;
+                loader.classList.add('d-none');
+                icon.classList.remove('d-none');
+            }
+        });
+    </script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
